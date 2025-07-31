@@ -1,81 +1,81 @@
-name: Category-Based Article Generation
-on:
-  schedule:
-    # 6:00 AM SLT = 22:00 UTC (previous day)
-    - cron: '0 22 */7 * *'  # Runs every 7 days at 6 AM SLT
-  workflow_dispatch:
+# name: Category-Based Article Generation
+# on:
+#   schedule:
+#     # 6:00 AM SLT = 22:00 UTC (previous day)
+#     - cron: '0 22 */7 * *'  # Runs every 7 days at 6 AM SLT
+#   workflow_dispatch:
 
-jobs:
-  generate-category-articles:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate category-based articles with retry logic
-        run: |
-          MAX_RETRIES=3
-          RETRY_INTERVAL=300  # seconds (5 minutes)
-          SUCCESS=false
+# jobs:
+#   generate-category-articles:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Generate category-based articles with retry logic
+#         run: |
+#           MAX_RETRIES=3
+#           RETRY_INTERVAL=300  # seconds (5 minutes)
+#           SUCCESS=false
           
-          echo "🚀 Starting CATEGORY-BASED article generation process..."
-          echo "📅 Current time: $(date)"
-          echo "🌐 Timezone: Asia/Colombo (SLT)"
+#           echo "🚀 Starting CATEGORY-BASED article generation process..."
+#           echo "📅 Current time: $(date)"
+#           echo "🌐 Timezone: Asia/Colombo (SLT)"
           
-          for ((i=1; i<=MAX_RETRIES; i++)); do
-            echo ""
-            echo "📝 Attempt $i of $MAX_RETRIES..."
+#           for ((i=1; i<=MAX_RETRIES; i++)); do
+#             echo ""
+#             echo "📝 Attempt $i of $MAX_RETRIES..."
             
-            # Call the category-based article generation endpoint
-            RESPONSE=$(curl -s -w "%{http_code}" -o response.json -X POST "https://effortless-connection-2f75f4ee80.strapiapp.com/api/category-based-article-generation" \
-              -H "Content-Type: application/json" \
-              -H "Authorization: Bearer ${{ secrets.STRAPI_API_TOKEN }}")
+#             # Call the category-based article generation endpoint
+#             RESPONSE=$(curl -s -w "%{http_code}" -o response.json -X POST "https://effortless-connection-2f75f4ee80.strapiapp.com/api/category-based-article-generation" \
+#               -H "Content-Type: application/json" \
+#               -H "Authorization: Bearer ${{ secrets.STRAPI_API_TOKEN }}")
             
-            echo "📊 HTTP Status: $RESPONSE"
-            echo "📄 Response Details:"
-            cat response.json
-            echo ""
+#             echo "📊 HTTP Status: $RESPONSE"
+#             echo "📄 Response Details:"
+#             cat response.json
+#             echo ""
             
-            # Accept both 200 (full success) and 207 (partial success)
-            if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 207 ]; then
-              echo "✅ CATEGORY-BASED Article generation completed successfully on attempt $i"
-              SUCCESS=true
-              break
-            else
-              echo "❌ Failed attempt $i with HTTP status $RESPONSE"
+#             # Accept both 200 (full success) and 207 (partial success)
+#             if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 207 ]; then
+#               echo "✅ CATEGORY-BASED Article generation completed successfully on attempt $i"
+#               SUCCESS=true
+#               break
+#             else
+#               echo "❌ Failed attempt $i with HTTP status $RESPONSE"
               
-              if [ "$i" -lt "$MAX_RETRIES" ]; then
-                echo "⏳ Waiting $RETRY_INTERVAL seconds before retry..."
-                sleep $RETRY_INTERVAL
-              fi
-            fi
-          done
+#               if [ "$i" -lt "$MAX_RETRIES" ]; then
+#                 echo "⏳ Waiting $RETRY_INTERVAL seconds before retry..."
+#                 sleep $RETRY_INTERVAL
+#               fi
+#             fi
+#           done
           
-          echo ""
-          if [ "$SUCCESS" = false ]; then
-            echo "❌ All $MAX_RETRIES attempts failed for CATEGORY-BASED generation!"
-            echo "🔍 Final response:"
-            cat response.json
-            echo ""
-            echo "🚨 CATEGORY-BASED Article generation failed - please check Strapi logs"
-            exit 1
-          else
-            echo "🎉 CATEGORY-BASED Article generation completed successfully!"
-            echo "✨ Generation finished at: $(date)"
-          fi
+#           echo ""
+#           if [ "$SUCCESS" = false ]; then
+#             echo "❌ All $MAX_RETRIES attempts failed for CATEGORY-BASED generation!"
+#             echo "🔍 Final response:"
+#             cat response.json
+#             echo ""
+#             echo "🚨 CATEGORY-BASED Article generation failed - please check Strapi logs"
+#             exit 1
+#           else
+#             echo "🎉 CATEGORY-BASED Article generation completed successfully!"
+#             echo "✨ Generation finished at: $(date)"
+#           fi
 
-  summary:
-    runs-on: ubuntu-latest
-    needs: generate-category-articles
-    if: always()
-    steps:
-      - name: Workflow summary
-        run: |
-          echo "📋 Category-Based Generation Summary"
-          echo "================================="
-          echo "📅 Completed at: $(date)"
-          echo ""
+#   summary:
+#     runs-on: ubuntu-latest
+#     needs: generate-category-articles
+#     if: always()
+#     steps:
+#       - name: Workflow summary
+#         run: |
+#           echo "📋 Category-Based Generation Summary"
+#           echo "================================="
+#           echo "📅 Completed at: $(date)"
+#           echo ""
           
-          if [ "${{ needs.generate-category-articles.result }}" == "success" ]; then
-            echo "🎉 Overall Status: SUCCESS - Category articles generated"
-          else
-            echo "🚨 Overall Status: FAILED - Category article generation unsuccessful"
-            exit 1
-          fi
+#           if [ "${{ needs.generate-category-articles.result }}" == "success" ]; then
+#             echo "🎉 Overall Status: SUCCESS - Category articles generated"
+#           else
+#             echo "🚨 Overall Status: FAILED - Category article generation unsuccessful"
+#             exit 1
+#           fi
